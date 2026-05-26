@@ -1070,6 +1070,188 @@ tbody tr:last-child td { border-bottom: none; }
 .tag-bb   { background: rgba(99,102,241,0.12); color: #818cf8; border:1px solid rgba(99,102,241,0.25); }
 .tag-mob  { background: var(--accent-glow);    color: var(--accent); border:1px solid var(--border-hi); }
 
+
+/* ═══════════════════════════════════════════
+   LOGIN OVERLAY
+═══════════════════════════════════════════ */
+#loginOverlay {
+  position: fixed; inset: 0; z-index: 9000;
+  background: var(--bg-deep);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+}
+#loginOverlay.hidden { display: none; }
+
+.login-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-hi);
+  border-radius: 20px;
+  padding: 40px 36px;
+  width: 380px; max-width: 95vw;
+  position: relative;
+  box-shadow: var(--shadow);
+  animation: fadeSlide .3s ease;
+}
+.login-box::before {
+  content: '';
+  position: absolute; top:0; left:0; right:0; height:3px;
+  background: var(--grad); border-radius: 20px 20px 0 0;
+}
+.login-brand {
+  text-align: center; margin-bottom: 28px;
+}
+.login-hex {
+  width: 52px; height: 52px; margin: 0 auto 12px;
+  background: var(--grad);
+  clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color:#000;
+  box-shadow: 0 0 30px var(--accent-glow);
+}
+.login-brand h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight:900; color: var(--text-hi);
+}
+.login-brand p { font-size:12px; color:var(--text-mid); margin-top:3px; }
+
+.login-tab-row {
+  display: flex; gap:4px;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 10px; padding: 4px;
+  margin-bottom: 20px;
+}
+.login-tab {
+  flex:1; padding: 8px; border-radius: 7px;
+  background: transparent; border: none;
+  font-family: 'Outfit',sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-mid); cursor: pointer;
+  transition: all .15s; text-align: center;
+}
+.login-tab.on {
+  background: var(--grad); color:#000;
+  box-shadow: 0 2px 10px var(--accent-glow);
+}
+.login-err {
+  background: rgba(248,113,113,.1);
+  border: 1px solid rgba(248,113,113,.25);
+  border-radius: 9px; padding: 10px 14px;
+  font-size: 13px; color: var(--danger);
+  display: none; margin-top: 12px;
+  align-items: center; gap:8px;
+}
+.login-err.show { display:flex; }
+
+/* Admin badge in topbar */
+.admin-badge {
+  display: inline-flex; align-items: center; gap:6px;
+  background: var(--accent-glow);
+  border: 1px solid var(--border-hi);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px; font-weight: 700;
+  color: var(--accent); letter-spacing:.06em;
+}
+.admin-badge i { font-size:9px; }
+
+/* Admin-only elements hidden for user */
+.admin-only { display:none; }
+body.is-admin .admin-only { display:flex; }
+body.is-admin .admin-only-block { display:block !important; }
+
+/* ═══════════════════════════════════════════
+   REPORT STYLES
+═══════════════════════════════════════════ */
+.report-type-row {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 14px; margin-bottom: 22px;
+}
+.rtype-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 16px;
+  cursor: pointer; text-align: center;
+  transition: all .2s;
+  position: relative; overflow: hidden;
+}
+.rtype-card::before {
+  content:''; position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:var(--grad); opacity:0;
+  transition: opacity .2s;
+}
+.rtype-card:hover, .rtype-card.sel {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+.rtype-card:hover::before, .rtype-card.sel::before { opacity:1; }
+.rtype-icon {
+  width:40px;height:40px;border-radius:10px;
+  background:var(--accent-glow); border:1px solid var(--border-hi);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:var(--accent);
+  margin:0 auto 10px;
+  transition: all .2s;
+}
+.rtype-card.sel .rtype-icon {
+  background:var(--grad); color:#000; border-color:transparent;
+  box-shadow:0 4px 14px var(--accent-glow);
+}
+.rtype-card h4 {
+  font-family:'Playfair Display',serif;
+  font-size:14px;font-weight:700;color:var(--text-hi);
+  margin-bottom:4px;
+}
+.rtype-card p { font-size:11px;color:var(--text-mid); }
+
+.report-filters {
+  display:flex; gap:12px; align-items:flex-end;
+  flex-wrap:wrap; margin-bottom:18px;
+}
+.report-filters .fg { flex:1; min-width:140px; }
+
+/* Yearly stat row inside report */
+.yr-stat-row {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:12px; margin-bottom:20px;
+}
+.yr-stat {
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:12px; padding:16px 18px;
+  transition: border-color .2s;
+}
+.yr-stat:hover { border-color:var(--border-hi); }
+.yr-stat-label {
+  font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-mid);
+  margin-bottom:8px;
+}
+.yr-stat-val {
+  font-family:'Playfair Display',serif;
+  font-size:22px;font-weight:700;color:var(--text-hi);
+}
+.yr-stat-sub { font-size:11px;color:var(--text-mid);margin-top:4px; }
+.yr-stat.hi  { border-color:rgba(74,222,128,.3); }
+.yr-stat.lo  { border-color:rgba(248,113,113,.3); }
+.yr-stat.avg { border-color:var(--border-hi); }
+.yr-stat.peak{ border-color:rgba(251,191,36,.3); }
+
+/* Verify tick — admin only */
+.verify-btn {
+  background:transparent; border:none;
+  cursor:pointer; font-size:16px;
+  transition:transform .15s;
+  padding:4px;
+}
+.verify-btn:hover { transform:scale(1.2); }
+.verified   { color:var(--success); }
+.unverified { color:var(--text-lo); }
+
 /* ═══════════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════════ */
@@ -1139,7 +1321,16 @@ tbody tr:last-child td { border-bottom: none; }
       Search
     </button>
 
+    <button class="nav-item" data-tab="reports">
+      <span class="nav-icon"><i class="fas fa-file-chart-line"></i></span>
+      Reports
+    </button>
+
     <div class="nav-section-label">System</div>
+    <button class="nav-item admin-only" data-tab="admin" style="display:none">
+      <span class="nav-icon"><i class="fas fa-shield-alt"></i></span>
+      Admin Panel
+    </button>
     <button class="nav-item" data-tab="settings">
       <span class="nav-icon"><i class="fas fa-cog"></i></span>
       Settings
@@ -1170,8 +1361,10 @@ tbody tr:last-child td { border-bottom: none; }
     </div>
     <div class="topbar-right">
       <div class="live-dot" id="liveDot" title="Supabase connected"></div>
+      <span class="admin-badge admin-only" id="adminBadge" style="display:none"><i class="fas fa-shield-alt"></i> ADMIN</span>
       <button class="btn btn-ghost btn-sm" onclick="refreshTab()"><i class="fas fa-sync-alt"></i> Refresh</button>
       <button class="btn btn-gold btn-sm" onclick="openMonthModal()"><i class="fas fa-calendar-plus"></i> Add Month</button>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
   </header>
 
@@ -1542,6 +1735,131 @@ tbody tr:last-child td { border-bottom: none; }
       </div>
     </div>
 
+
+    <!-- ─── REPORTS ────────────────────────── -->
+    <div class="pane" id="pane-reports">
+      <!-- Report type selector -->
+      <div class="report-type-row">
+        <div class="rtype-card sel" data-rtype="network" onclick="selReportType(this,'network')">
+          <div class="rtype-icon"><i class="fas fa-signal"></i></div>
+          <h4>Network Report</h4>
+          <p>Airtel, Jio, Vi, BSNL…</p>
+        </div>
+        <div class="rtype-card" data-rtype="branch" onclick="selReportType(this,'branch')">
+          <div class="rtype-icon"><i class="fas fa-building"></i></div>
+          <h4>Branch Report</h4>
+          <p>Office-wise breakdown</p>
+        </div>
+        <div class="rtype-card" data-rtype="user" onclick="selReportType(this,'user')">
+          <div class="rtype-icon"><i class="fas fa-user"></i></div>
+          <h4>User Report</h4>
+          <p>Individual user summary</p>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="card">
+        <div class="card-body" style="padding:16px 22px">
+          <div class="report-filters">
+            <div class="fg">
+              <label class="fl">Year</label>
+              <select class="fi" id="rpt_year" style="min-width:110px"></select>
+            </div>
+            <div class="fg" id="rpt_fg_group">
+              <label class="fl" id="rpt_group_label">Network</label>
+              <select class="fi" id="rpt_group"><option value="">All</option></select>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:8px;padding-bottom:1px">
+              <button class="btn btn-gold" onclick="generateReport()"><i class="fas fa-bolt"></i> Generate</button>
+              <button class="btn btn-ghost" onclick="exportReportExcel()"><i class="fas fa-file-excel"></i> Export</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Yearly summary stats -->
+      <div class="yr-stat-row" id="rptStats"></div>
+
+      <!-- Chart -->
+      <div class="card" id="rptChartCard" style="display:none;margin-bottom:20px">
+        <div class="card-header">
+          <div class="card-title" id="rptChartTitle"><span class="title-icon"><i class="fas fa-chart-bar"></i></span> Monthly Breakdown</div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="rptChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Detail table -->
+      <div class="card" id="rptTableCard" style="display:none">
+        <div class="card-header">
+          <div class="card-title" id="rptTableTitle"><span class="title-icon"><i class="fas fa-table"></i></span> Detailed Records</div>
+          <span id="rptRowCount" style="font-size:12px;color:var(--text-mid)"></span>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr id="rptThead"></tr></thead>
+            <tbody id="rptTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── ADMIN PANEL ─────────────────────── -->
+    <div class="pane" id="pane-admin">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="title-icon"><i class="fas fa-shield-alt"></i></span> Payment Verification</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select class="fi" id="adm_month_filter" onchange="loadAdminPayments()" style="padding:6px 12px;font-size:12px">
+              <option value="">All Months</option>
+            </select>
+            <select class="fi" id="adm_verified_filter" onchange="loadAdminPayments()" style="padding:6px 12px;font-size:12px">
+              <option value="">All</option>
+              <option value="true">Verified</option>
+              <option value="false">Unverified</option>
+            </select>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>✓</th><th>Branch</th><th>User</th><th>Network</th>
+              <th>Mobile</th><th>Month</th><th>Amount</th><th>Date</th><th>Mode</th><th>Verified By</th><th>Action</th>
+            </tr></thead>
+            <tbody id="admTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Admin password change -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-header">
+          <div class="card-title"><span class="title-icon"><i class="fas fa-key"></i></span> Change Admin Password</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr">
+            <div class="fg">
+              <label class="fl">Current Password</label>
+              <input class="fi" type="password" id="adm_cur_pw" placeholder="Current password">
+            </div>
+            <div class="fg">
+              <label class="fl">New Password</label>
+              <input class="fi" type="password" id="adm_new_pw" placeholder="New password">
+            </div>
+            <div class="fg">
+              <label class="fl">Confirm New</label>
+              <input class="fi" type="password" id="adm_cfm_pw" placeholder="Confirm new password">
+            </div>
+          </div>
+          <div class="form-footer">
+            <button class="btn btn-gold" onclick="changeAdminPw()"><i class="fas fa-key"></i> Change Password</button>
+          </div>
+          <div class="alert" id="alAdmPw"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ─── SETTINGS ───────────────────────── -->
     <div class="pane" id="pane-settings">
       <div class="card">
@@ -1619,6 +1937,35 @@ tbody tr:last-child td { border-bottom: none; }
   </div>
 </div>
 
+
+<!-- ══════════════════ LOGIN OVERLAY ═══════════════ -->
+<div id="loginOverlay">
+  <div class="login-box">
+    <div class="login-brand">
+      <div class="login-hex"><i class="fas fa-phone-alt"></i></div>
+      <h2>TelEx Pro</h2>
+      <p id="loginSubtitle">Sign in to continue</p>
+    </div>
+    <div class="login-tab-row">
+      <button class="login-tab on" onclick="setLoginRole('user',this)">User</button>
+      <button class="login-tab" onclick="setLoginRole('admin',this)">Admin</button>
+    </div>
+    <div class="fg" style="margin-bottom:14px">
+      <label class="fl">Password</label>
+      <input class="fi" type="password" id="loginPw" placeholder="Enter password"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn btn-gold" style="width:100%;justify-content:center;padding:13px"
+            onclick="doLogin()">
+      <i class="fas fa-sign-in-alt"></i> Sign In
+    </button>
+    <div class="login-err" id="loginErr">
+      <i class="fas fa-exclamation-circle"></i>
+      <span id="loginErrMsg">Incorrect password</span>
+    </div>
+  </div>
+</div>
+
 <div id="toast-area"></div>
 
 <!-- ══════════════════ SCRIPT ═══════════════════ -->
@@ -1691,6 +2038,8 @@ const tabMeta = {
   payments:  ['Payments',            'Record single or split payments'],
   analysis:  ['Analytics',           'Expense charts & breakdown'],
   search:    ['Search',              'Find records instantly'],
+  reports:   ['Reports',             'Network · Branch · User yearly reports'],
+  admin:     ['Admin Panel',         'Payment verification & admin controls'],
   settings:  ['Settings',            'Configure Supabase & months'],
 };
 
@@ -1711,13 +2060,15 @@ function refreshTab() {
 
 function loadTab(t) {
   switch(t) {
-    case 'dashboard': loadDash();    break;
-    case 'numbers':   loadNums();    break;
-    case 'broadband': loadBB();      break;
-    case 'payments':  loadPayTab();  break;
-    case 'analysis':  loadAna();     break;
-    case 'search':    doSearch();    break;
-    case 'settings':  loadSettings();break;
+    case 'dashboard': loadDash();       break;
+    case 'numbers':   loadNums();       break;
+    case 'broadband': loadBB();         break;
+    case 'payments':  loadPayTab();     break;
+    case 'analysis':  loadAna();        break;
+    case 'search':    doSearch();       break;
+    case 'reports':   initReports();    break;
+    case 'admin':     loadAdminPayments(); break;
+    case 'settings':  loadSettings();   break;
   }
 }
 
@@ -2404,6 +2755,421 @@ async function toggleBBSt(id, cur) {
   else { toast(`BB Status → ${next}`,'ok'); loadBB(); }
 }
 
+
+/* ═══════════════════════════════════════════════════════════
+   AUTH — Login / Logout / Role system
+═══════════════════════════════════════════════════════════ */
+const AUTH_KEY   = 'telexauth';
+const DEFAULT_PASSWORDS = { user:'user123', admin:'admin123' };
+let   currentRole = null;   // 'user' | 'admin'
+let   loginRole   = 'user'; // selected on login screen
+
+function setLoginRole(role, btn) {
+  loginRole = role;
+  document.querySelectorAll('.login-tab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('loginPw').value = '';
+  document.getElementById('loginErr').classList.remove('show');
+}
+
+function getPasswords() {
+  try {
+    const c = loadCfg();
+    return c.passwords || DEFAULT_PASSWORDS;
+  } catch { return DEFAULT_PASSWORDS; }
+}
+
+function doLogin() {
+  const pw   = document.getElementById('loginPw').value;
+  const pwds = getPasswords();
+  const ok   = (loginRole==='admin' && pw===pwds.admin) ||
+               (loginRole==='user'  && pw===pwds.user);
+  if (!ok) {
+    document.getElementById('loginErr').classList.add('show');
+    document.getElementById('loginErrMsg').textContent = 'Incorrect password. Try again.';
+    document.getElementById('loginPw').value='';
+    return;
+  }
+  currentRole = loginRole;
+  sessionStorage.setItem(AUTH_KEY, currentRole);
+  applyRole(currentRole);
+  document.getElementById('loginOverlay').classList.add('hidden');
+  toast(`Welcome! Signed in as ${currentRole.toUpperCase()}`,'ok');
+}
+
+function doLogout() {
+  currentRole = null;
+  sessionStorage.removeItem(AUTH_KEY);
+  document.getElementById('loginPw').value='';
+  document.getElementById('loginErr').classList.remove('show');
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  // go back to dashboard
+  goTab('dashboard');
+}
+
+function applyRole(role) {
+  const isAdmin = role === 'admin';
+  document.body.classList.toggle('is-admin', isAdmin);
+  // Show/hide admin nav item
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = isAdmin ? '' : 'none';
+  });
+}
+
+function changeAdminPw() {
+  const cur = document.getElementById('adm_cur_pw').value;
+  const nw  = document.getElementById('adm_new_pw').value;
+  const cfm = document.getElementById('adm_cfm_pw').value;
+  const pwds= getPasswords();
+  if (cur !== pwds.admin) { showAlert('alAdmPw','Current password incorrect.','err'); return; }
+  if (!nw || nw.length < 4) { showAlert('alAdmPw','New password must be at least 4 characters.','err'); return; }
+  if (nw !== cfm)           { showAlert('alAdmPw','Passwords do not match.','err'); return; }
+  const c = loadCfg();
+  c.passwords = { ...pwds, admin: nw };
+  saveCfgLocal(c);
+  showAlert('alAdmPw','Admin password changed successfully!','ok');
+  ['adm_cur_pw','adm_new_pw','adm_cfm_pw'].forEach(id=>document.getElementById(id).value='');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   REPORTS
+═══════════════════════════════════════════════════════════ */
+let rptType = 'network';   // current report type
+let rptData = [];          // raw payment rows for current report
+let rptMeta = {};          // { year, group }
+
+async function initReports() {
+  if (!sb) { document.getElementById('rptStats').innerHTML = noConnHTML(); return; }
+
+  // Populate year dropdown from months_config
+  const { data: mData } = await sb.from('months_config').select('month_year').order('month_year',{ascending:false});
+  const years = [...new Set((mData||[]).map(m=>m.month_year))];
+  const ysel  = document.getElementById('rpt_year');
+  ysel.innerHTML = years.map(y=>`<option value="${y}">${y}</option>`).join('');
+
+  await loadReportGroups();
+}
+
+async function loadReportGroups() {
+  const gsel  = document.getElementById('rpt_group');
+  const glbl  = document.getElementById('rpt_group_label');
+  if (!sb) return;
+  if (rptType==='network') {
+    const { data } = await sb.from('telephone_numbers').select('network').order('network');
+    const nets = [...new Set((data||[]).map(r=>r.network))];
+    glbl.textContent = 'Network';
+    gsel.innerHTML   = '<option value="">All Networks</option>' + nets.map(n=>`<option>${n}</option>`).join('');
+  } else if (rptType==='branch') {
+    const { data } = await sb.from('telephone_numbers').select('branch').order('branch');
+    const brs  = [...new Set((data||[]).map(r=>r.branch))];
+    glbl.textContent = 'Branch';
+    gsel.innerHTML   = '<option value="">All Branches</option>' + brs.map(b=>`<option>${b}</option>`).join('');
+  } else {
+    const { data } = await sb.from('telephone_numbers').select('user_name,branch').order('user_name');
+    glbl.textContent = 'User';
+    gsel.innerHTML   = '<option value="">All Users</option>' +
+      (data||[]).map(u=>`<option value="${u.user_name}">${u.user_name} (${u.branch})</option>`).join('');
+  }
+}
+
+function selReportType(card, type) {
+  rptType = type;
+  document.querySelectorAll('.rtype-card').forEach(c=>c.classList.remove('sel'));
+  card.classList.add('sel');
+  loadReportGroups();
+  // clear previous results
+  document.getElementById('rptStats').innerHTML='';
+  document.getElementById('rptChartCard').style.display='none';
+  document.getElementById('rptTableCard').style.display='none';
+}
+
+async function generateReport() {
+  if (!sb) { toast('Connect Supabase first.','err'); return; }
+  const year  = parseInt(document.getElementById('rpt_year').value);
+  const group = document.getElementById('rpt_group').value;
+  rptMeta = { year, group };
+
+  // Fetch all payments for the year via vw_payment_detail
+  let query = sb.from('vw_payment_detail')
+    .select('*')
+    .in('month_label', await monthsForYear(year));
+
+  if (group) {
+    if (rptType==='network') query = query.eq('network', group);
+    else if (rptType==='branch') query = query.eq('branch', group);
+    else query = query.eq('user_name', group);
+  }
+
+  const { data, error } = await query.order('month_label');
+  if (error) { toast(error.message,'err'); return; }
+  rptData = data||[];
+
+  if (!rptData.length) {
+    document.getElementById('rptStats').innerHTML =
+      `<div class="empty" style="grid-column:1/-1"><i class="fas fa-chart-bar"></i><p>No data found for the selected filters</p></div>`;
+    document.getElementById('rptChartCard').style.display='none';
+    document.getElementById('rptTableCard').style.display='none';
+    return;
+  }
+
+  renderReportStats(year);
+  renderReportChart(year, group);
+  renderReportTable();
+}
+
+async function monthsForYear(year) {
+  const { data } = await sb.from('months_config')
+    .select('month_label').eq('month_year', year).eq('is_active',true).order('sort_order');
+  return (data||[]).map(m=>m.month_label);
+}
+
+function renderReportStats(year) {
+  const amounts = rptData.map(r=>Number(r.amount));
+  const total   = amounts.reduce((s,a)=>s+a,0);
+  const highest = Math.max(...amounts);
+  const lowest  = Math.min(...amounts);
+  const avg     = amounts.length ? total/amounts.length : 0;
+
+  // Which group/month had the highest amount?
+  const peakRow = rptData.find(r=>Number(r.amount)===highest)||{};
+  const peakLbl = rptType==='network' ? peakRow.network
+                : rptType==='branch'  ? peakRow.branch
+                : peakRow.user_name;
+
+  // Monthly totals for finding peak month
+  const byMon = {};
+  rptData.forEach(r => { byMon[r.month_label] = (byMon[r.month_label]||0)+Number(r.amount); });
+  const peakMonth = Object.entries(byMon).sort((a,b)=>b[1]-a[1])[0]||['—',0];
+
+  document.getElementById('rptStats').innerHTML = `
+    <div class="yr-stat">
+      <div class="yr-stat-label">📅 Year</div>
+      <div class="yr-stat-val">${year}</div>
+      <div class="yr-stat-sub">${rptData.length} payment records</div>
+    </div>
+    <div class="yr-stat">
+      <div class="yr-stat-label">💰 Total Expense</div>
+      <div class="yr-stat-val">₹${fmt(total)}</div>
+      <div class="yr-stat-sub">Full year sum</div>
+    </div>
+    <div class="yr-stat hi">
+      <div class="yr-stat-label" style="color:var(--success)">⬆ Highest Amount</div>
+      <div class="yr-stat-val" style="color:var(--success)">₹${fmt(highest)}</div>
+      <div class="yr-stat-sub">${peakRow.user_name||'—'} · ${peakRow.month_label||'—'}</div>
+    </div>
+    <div class="yr-stat lo">
+      <div class="yr-stat-label" style="color:var(--danger)">⬇ Lowest Amount</div>
+      <div class="yr-stat-val" style="color:var(--danger)">₹${fmt(lowest)}</div>
+      <div class="yr-stat-sub">Single payment</div>
+    </div>
+    <div class="yr-stat avg">
+      <div class="yr-stat-label" style="color:var(--accent)">∅ Average Amount</div>
+      <div class="yr-stat-val" style="color:var(--accent)">₹${fmt(avg)}</div>
+      <div class="yr-stat-sub">Per payment</div>
+    </div>
+    <div class="yr-stat peak">
+      <div class="yr-stat-label" style="color:var(--warning)">🔥 Peak Month</div>
+      <div class="yr-stat-val" style="color:var(--warning)">${peakMonth[0]}</div>
+      <div class="yr-stat-sub">₹${fmt(peakMonth[1])}</div>
+    </div>`;
+}
+
+function renderReportChart(year, group) {
+  // Group by month, then by the rptType key
+  const byMon = {};
+  const groups = [...new Set(rptData.map(r =>
+    rptType==='network' ? r.network : rptType==='branch' ? r.branch : r.user_name
+  ))];
+  const allMonths = [...new Set(rptData.map(r=>r.month_label))].sort();
+
+  const datasets = groups.map((g,i)=>{
+    const COLORS=['#d4af37','#63b3ed','#34d399','#f87171','#a78bfa','#fb923c','#38bdf8','#4ade80'];
+    const c = COLORS[i%COLORS.length];
+    return {
+      label: g,
+      data: allMonths.map(m=>{
+        return rptData.filter(r=>r.month_label===m &&
+          (rptType==='network'?r.network:rptType==='branch'?r.branch:r.user_name)===g
+        ).reduce((s,r)=>s+Number(r.amount),0);
+      }),
+      backgroundColor: c+'99', borderColor: c,
+      borderWidth: 2, borderRadius: 6,
+    };
+  });
+
+  document.getElementById('rptChartCard').style.display='block';
+  const label = group || (rptType==='network'?'All Networks':rptType==='branch'?'All Branches':'All Users');
+  document.getElementById('rptChartTitle').innerHTML =
+    `<span class="title-icon"><i class="fas fa-chart-bar"></i></span> ${year} Monthly Breakdown — ${label}`;
+
+  if (Charts.rpt) Charts.rpt.destroy();
+  Charts.rpt = new Chart(document.getElementById('rptChart').getContext('2d'),{
+    type: groups.length>1 ? 'bar' : 'bar',
+    data: { labels: allMonths, datasets },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ position:'top', labels:{ color:'#a09880', font:{size:11} }},
+        tooltip:{ callbacks:{ label:c=>' ₹'+fmt(c.parsed.y) }}
+      },
+      scales:{
+        x:{ stacked: groups.length>1, grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#5a5448',font:{size:10}} },
+        y:{ stacked: groups.length>1, beginAtZero:true, grid:{color:'rgba(255,255,255,0.04)'},
+            ticks:{ color:'#5a5448', font:{size:10}, callback:v=>'₹'+v.toLocaleString('en-IN') }}
+      }
+    }
+  });
+}
+
+function renderReportTable() {
+  document.getElementById('rptTableCard').style.display='block';
+  document.getElementById('rptRowCount').textContent = rptData.length+' records';
+
+  // Headers differ by type
+  const isAdmin = currentRole==='admin';
+  const admHdr  = isAdmin ? '<th>Verified</th>' : '';
+  const admHdrA = isAdmin ? '<th>Action</th>' : '';
+
+  if (rptType==='network') {
+    document.getElementById('rptThead').innerHTML =
+      `<th>Network</th><th>Branch</th><th>User</th><th>Mobile</th><th>Month</th><th>Amount</th><th>Date</th><th>Mode</th>${admHdr}`;
+    document.getElementById('rptTbody').innerHTML = rptData.map(r=>`
+      <tr>
+        <td><span class="tag tag-bb">${r.network}</span></td>
+        <td>${r.branch}</td>
+        <td style="color:var(--text-hi);font-weight:500">${r.user_name}</td>
+        <td>${r.mobile_no}</td>
+        <td style="color:var(--accent)">${r.month_label}</td>
+        <td style="color:var(--text-hi);font-weight:700">₹${fmt(r.amount)}</td>
+        <td>${r.payment_date||'—'}</td>
+        <td><span class="tag tag-mode">${r.payment_mode}</span></td>
+        ${isAdmin ? `<td>${verifyBtn(r.payment_id,r.is_verified)}</td>` : ''}
+      </tr>`).join('');
+  } else if (rptType==='branch') {
+    document.getElementById('rptThead').innerHTML =
+      `<th>Branch</th><th>Network</th><th>User</th><th>Mobile</th><th>Month</th><th>Amount</th><th>Date</th><th>Mode</th>${admHdr}`;
+    document.getElementById('rptTbody').innerHTML = rptData.map(r=>`
+      <tr>
+        <td style="color:var(--text-hi);font-weight:600">${r.branch}</td>
+        <td>${r.network}</td>
+        <td style="color:var(--text-hi)">${r.user_name}</td>
+        <td>${r.mobile_no}</td>
+        <td style="color:var(--accent)">${r.month_label}</td>
+        <td style="color:var(--text-hi);font-weight:700">₹${fmt(r.amount)}</td>
+        <td>${r.payment_date||'—'}</td>
+        <td><span class="tag tag-mode">${r.payment_mode}</span></td>
+        ${isAdmin ? `<td>${verifyBtn(r.payment_id,r.is_verified)}</td>` : ''}
+      </tr>`).join('');
+  } else {
+    document.getElementById('rptThead').innerHTML =
+      `<th>User</th><th>Branch</th><th>Network</th><th>Mobile</th><th>Month</th><th>Amount</th><th>Date</th><th>Mode</th>${admHdr}`;
+    document.getElementById('rptTbody').innerHTML = rptData.map(r=>`
+      <tr>
+        <td style="color:var(--text-hi);font-weight:600">${r.user_name}</td>
+        <td>${r.branch}</td>
+        <td>${r.network}</td>
+        <td>${r.mobile_no}</td>
+        <td style="color:var(--accent)">${r.month_label}</td>
+        <td style="color:var(--text-hi);font-weight:700">₹${fmt(r.amount)}</td>
+        <td>${r.payment_date||'—'}</td>
+        <td><span class="tag tag-mode">${r.payment_mode}</span></td>
+        ${isAdmin ? `<td>${verifyBtn(r.payment_id,r.is_verified)}</td>` : ''}
+      </tr>`).join('');
+  }
+  document.getElementById('rptTableTitle').innerHTML =
+    `<span class="title-icon"><i class="fas fa-table"></i></span> ${rptMeta.year} Detailed Records`;
+}
+
+function verifyBtn(pid, verified) {
+  return `<button class="verify-btn ${verified?'verified':'unverified'}"
+    onclick="toggleVerify('${pid}',${!!verified})" title="${verified?'Verified — click to unverify':'Click to verify'}">
+    ${verified ? '<i class="fas fa-check-circle"></i>' : '<i class="far fa-circle"></i>'}
+  </button>`;
+}
+
+function exportReportExcel() {
+  if (!rptData.length) { toast('Generate a report first.','err'); return; }
+  const headers = ['Branch','User','Network','Mobile','Month','Amount','Date','Mode','Status'];
+  const rows    = rptData.map(r=>[
+    r.branch, r.user_name, r.network, r.mobile_no,
+    r.month_label, Number(r.amount), r.payment_date||'',
+    r.payment_mode, r.status
+  ]);
+  const wb  = XLSX.utils.book_new();
+  const ws  = XLSX.utils.aoa_to_sheet([headers,...rows]);
+  ws['!cols'] = headers.map(()=>({wch:16}));
+  XLSX.utils.book_append_sheet(wb, ws, 'Report');
+  XLSX.writeFile(wb, `TelEx_Report_${rptType}_${rptMeta.year||'all'}.xlsx`);
+  toast('Report exported!','ok');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ADMIN — Payment Verification
+═══════════════════════════════════════════════════════════ */
+async function loadAdminPayments() {
+  if (!sb) { document.getElementById('admTbody').innerHTML=`<tr><td colspan="11">${noConnHTML()}</td></tr>`; return; }
+
+  const monFilter = document.getElementById('adm_month_filter').value;
+  const verFilter = document.getElementById('adm_verified_filter').value;
+
+  // populate month filter if empty
+  const mSel = document.getElementById('adm_month_filter');
+  if (mSel.options.length <= 1) {
+    const { data: mData } = await sb.from('months_config').select('month_label,sort_order').eq('is_active',true).order('sort_order');
+    mSel.innerHTML = '<option value="">All Months</option>' +
+      (mData||[]).map(m=>`<option value="${m.month_label}">${m.month_label}</option>`).join('');
+    if (monFilter) mSel.value = monFilter;
+  }
+
+  let query = sb.from('vw_payment_detail').select('*').order('month_label').order('branch');
+  if (monFilter) query = query.eq('month_label', monFilter);
+  if (verFilter !== '') query = query.eq('is_verified', verFilter==='true');
+
+  const { data, error } = await query;
+  if (error) { toast(error.message,'err'); return; }
+  const rows = data||[];
+
+  const tbody = document.getElementById('admTbody');
+  if (!rows.length) {
+    tbody.innerHTML=`<tr><td colspan="11"><div class="empty"><i class="fas fa-check-double"></i><p>No payments found</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(r=>`
+    <tr>
+      <td>${verifyBtn(r.payment_id, r.is_verified)}</td>
+      <td>${r.branch}</td>
+      <td style="color:var(--text-hi);font-weight:500">${r.user_name}</td>
+      <td>${r.network}</td><td>${r.mobile_no}</td>
+      <td style="color:var(--accent)">${r.month_label}</td>
+      <td style="color:var(--text-hi);font-weight:700">₹${fmt(r.amount)}</td>
+      <td>${r.payment_date||'—'}</td>
+      <td><span class="tag tag-mode">${r.payment_mode}</span></td>
+      <td style="font-size:11px;color:var(--text-mid)">${r.verified_by||'—'}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="toggleSt('${r.telephone_id}','${r.status}')"
+          style="color:${r.status==='Active'?'var(--success)':'var(--danger)'}">
+          <i class="fas fa-toggle-${r.status==='Active'?'on':'off'}"></i>
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+async function toggleVerify(paymentId, currentState) {
+  if (currentRole !== 'admin') { toast('Admin access required.','err'); return; }
+  if (!sb) { toast('Connect Supabase first.','err'); return; }
+  const newState = !currentState;
+  const { error } = await sb.from('payments').update({
+    is_verified: newState,
+    verified_by: newState ? 'Admin' : null,
+    verified_at: newState ? new Date().toISOString() : null
+  }).eq('id', paymentId);
+  if (error) { toast(error.message,'err'); return; }
+  toast(newState ? '✅ Payment verified' : '↩ Verification removed','ok');
+  // refresh whichever view called it
+  const active = document.querySelector('.nav-item.active');
+  if (active) loadTab(active.dataset.tab);
+}
+
 /* ─── HELPERS ────────────────────────────── */
 function noConnHTML() {
   return `<div class="empty"><i class="fas fa-plug"></i><p>Go to <strong>Settings</strong> and connect Supabase to load data</p></div>`;
@@ -2414,7 +3180,16 @@ function noConnHTML() {
   const t = localStorage.getItem('telextheme')||'dark-gold';
   applyTheme(t);
   initSB();
-  loadDash();
+
+  // Check if already logged in this session
+  const savedRole = sessionStorage.getItem('telexauth');
+  if (savedRole === 'admin' || savedRole === 'user') {
+    currentRole = savedRole;
+    applyRole(currentRole);
+    document.getElementById('loginOverlay').classList.add('hidden');
+    loadDash();
+  }
+  // else: loginOverlay stays visible, waiting for login
 })();
 </script>
 </body>
