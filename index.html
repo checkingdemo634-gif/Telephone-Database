@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
 /* ═══════════════════════════════════════════
@@ -1003,6 +1004,73 @@ tbody tr:last-child td { border-bottom: none; }
 }
 
 /* ═══════════════════════════════════════════
+   IMPORT DROP ZONE
+═══════════════════════════════════════════ */
+.drop-zone {
+  border: 2px dashed var(--border-hi);
+  border-radius: 14px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg-deep);
+  position: relative;
+}
+.drop-zone:hover, .drop-zone.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+.drop-zone input[type=file] {
+  position: absolute; inset: 0;
+  opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.drop-zone-icon {
+  font-size: 32px;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: block;
+}
+.drop-zone p   { font-size: 13px; color: var(--text-mid); }
+.drop-zone strong { color: var(--text-hi); }
+
+/* template download strip */
+.tpl-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--accent-glow);
+  border: 1px solid var(--border-hi);
+  border-radius: 10px;
+  padding: 11px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-mid);
+}
+.tpl-strip strong { color: var(--text-hi); }
+
+/* import preview table */
+.import-result {
+  display: none;
+  margin-top: 16px;
+}
+.import-result.show { display: block; }
+.import-summary {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.imp-badge {
+  padding: 5px 13px; border-radius: 20px;
+  font-size: 12px; font-weight: 700;
+}
+.imp-ok  { background: rgba(74,222,128,0.12); color: var(--success); border:1px solid rgba(74,222,128,0.25); }
+.imp-err { background: rgba(248,113,113,0.12); color: var(--danger);  border:1px solid rgba(248,113,113,0.25); }
+.imp-tot { background: var(--accent-glow);     color: var(--accent);  border:1px solid var(--border-hi); }
+
+/* type badge for broadband vs mobile */
+.tag-bb   { background: rgba(99,102,241,0.12); color: #818cf8; border:1px solid rgba(99,102,241,0.25); }
+.tag-mob  { background: var(--accent-glow);    color: var(--accent); border:1px solid var(--border-hi); }
+
+/* ═══════════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════════ */
 @media (max-width: 1100px) {
@@ -1057,6 +1125,10 @@ tbody tr:last-child td { border-bottom: none; }
     <button class="nav-item" data-tab="numbers">
       <span class="nav-icon"><i class="fas fa-mobile-alt"></i></span>
       Numbers
+    </button>
+    <button class="nav-item" data-tab="broadband">
+      <span class="nav-icon"><i class="fas fa-wifi"></i></span>
+      Broadband
     </button>
     <button class="nav-item" data-tab="payments">
       <span class="nav-icon"><i class="fas fa-credit-card"></i></span>
@@ -1170,6 +1242,42 @@ tbody tr:last-child td { border-bottom: none; }
         </div>
       </div>
 
+      <div class="card" id="mobImportCard">
+        <div class="card-header">
+          <div class="card-title"><span class="title-icon"><i class="fas fa-file-import"></i></span> Import from Excel</div>
+          <button class="btn btn-ghost btn-sm" onclick="downloadTemplate('mobile')">
+            <i class="fas fa-download"></i> Download Template
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="tpl-strip">
+            <span><strong>Columns:</strong> Branch · User Name · Network · Mobile No · Payment Plan · Remarks</span>
+            <span style="color:var(--accent);font-size:11px;font-weight:700">XLSX / XLS / CSV</span>
+          </div>
+          <div class="drop-zone" id="mobDropZone">
+            <input type="file" accept=".xlsx,.xls,.csv" onchange="handleImportFile(event,'mobile')"
+                   ondragover="this.parentElement.classList.add('drag-over')"
+                   ondragleave="this.parentElement.classList.remove('drag-over')">
+            <i class="fas fa-cloud-upload-alt drop-zone-icon"></i>
+            <p><strong>Click to browse</strong> or drag & drop Excel file here</p>
+            <p style="margin-top:4px;font-size:11px;color:var(--text-lo)">e.g. Vapi · Prashant · Airtel · 9377962727 · Monthly</p>
+          </div>
+          <div class="import-result" id="mobImportResult">
+            <div class="import-summary" id="mobImportSummary"></div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>#</th><th>Branch</th><th>User</th><th>Network</th><th>Mobile</th><th>Plan</th><th>Status</th></tr></thead>
+              <tbody id="mobImportTbody"></tbody>
+            </table></div>
+            <div class="form-footer" style="margin-top:12px">
+              <button class="btn btn-gold" id="btnConfirmMobImport" onclick="confirmImport('mobile')">
+                <i class="fas fa-database"></i> Import to Database
+              </button>
+              <button class="btn btn-ghost" onclick="clearImport('mobile')"><i class="fas fa-times"></i> Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header">
           <div class="card-title"><span class="title-icon"><i class="fas fa-list"></i></span> Registered Numbers</div>
@@ -1278,6 +1386,114 @@ tbody tr:last-child td { border-bottom: none; }
             </div>
             <div class="alert" id="alSplit"></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── BROADBAND ───────────────────────── -->
+    <div class="pane" id="pane-broadband">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="title-icon"><i class="fas fa-wifi"></i></span> Register Broadband Connection</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="fg">
+              <label class="fl">Location / Branch *</label>
+              <input class="fi" id="bb_loc" placeholder="e.g. Surat Office">
+            </div>
+            <div class="fg">
+              <label class="fl">Account Name / Label *</label>
+              <input class="fi" id="bb_name" placeholder="e.g. Office BB">
+            </div>
+            <div class="fg">
+              <label class="fl">ISP / Provider *</label>
+              <input class="fi" id="bb_isp" placeholder="e.g. DL GTPL, DD FIBER BB, JioFiber">
+            </div>
+            <div class="fg">
+              <label class="fl">Account / Circuit No</label>
+              <input class="fi" id="bb_acc" placeholder="Account or circuit number">
+            </div>
+            <div class="fg">
+              <label class="fl">Plan Speed</label>
+              <input class="fi" id="bb_speed" placeholder="e.g. 100 Mbps">
+            </div>
+            <div class="fg">
+              <label class="fl">Payment Plan</label>
+              <select class="fi" id="bb_plan">
+                <option>Monthly</option><option>Quarterly</option>
+                <option>Half-Yearly</option><option>Yearly</option>
+                <option>Custom-2</option><option>Custom-4</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label class="fl">Monthly Amount ₹</label>
+              <input class="fi" type="number" id="bb_amt" placeholder="0.00" min="0" step="0.01">
+            </div>
+            <div class="fg">
+              <label class="fl">Remarks</label>
+              <input class="fi" id="bb_rem" placeholder="Optional">
+            </div>
+          </div>
+          <div class="form-footer">
+            <button class="btn btn-gold" id="btnSaveBB" onclick="saveBroadband()"><i class="fas fa-save"></i> Save Broadband</button>
+            <button class="btn btn-ghost" onclick="clearBBForm()"><i class="fas fa-times"></i> Clear</button>
+          </div>
+          <div class="alert" id="alBB"></div>
+        </div>
+      </div>
+
+      <!-- Import for Broadband -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="title-icon"><i class="fas fa-file-import"></i></span> Import Broadband from Excel</div>
+          <button class="btn btn-ghost btn-sm" onclick="downloadTemplate('broadband')">
+            <i class="fas fa-download"></i> Download Template
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="tpl-strip">
+            <span><strong>Columns:</strong> Location · Account Name · ISP · Account No · Plan Speed · Payment Plan · Amount · Remarks</span>
+            <span style="color:var(--accent);font-size:11px;font-weight:700">XLSX / XLS / CSV</span>
+          </div>
+          <div class="drop-zone" id="bbDropZone">
+            <input type="file" accept=".xlsx,.xls,.csv" onchange="handleImportFile(event,'broadband')"
+                   ondragover="this.parentElement.classList.add('drag-over')"
+                   ondragleave="this.parentElement.classList.remove('drag-over')">
+            <i class="fas fa-cloud-upload-alt drop-zone-icon"></i>
+            <p><strong>Click to browse</strong> or drag & drop Excel file here</p>
+            <p style="margin-top:4px;font-size:11px;color:var(--text-lo)">e.g. Surat · Office · DL GTPL · DD FIBER BB · Quarterly</p>
+          </div>
+          <div class="import-result" id="bbImportResult">
+            <div class="import-summary" id="bbImportSummary"></div>
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>#</th><th>Location</th><th>Name</th><th>ISP</th><th>Account No</th><th>Plan</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody id="bbImportTbody"></tbody>
+            </table></div>
+            <div class="form-footer" style="margin-top:12px">
+              <button class="btn btn-gold" id="btnConfirmBBImport" onclick="confirmImport('broadband')">
+                <i class="fas fa-database"></i> Import to Database
+              </button>
+              <button class="btn btn-ghost" onclick="clearImport('broadband')"><i class="fas fa-times"></i> Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Broadband list -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="title-icon"><i class="fas fa-list"></i></span> Broadband Connections</div>
+          <span id="bbCount" style="font-size:12px;color:var(--text-mid)"></span>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>Status</th><th>Location</th><th>Name</th><th>ISP</th>
+              <th>Account No</th><th>Speed</th><th>Plan</th><th>Amt ₹</th><th>Remarks</th><th>Action</th>
+            </tr></thead>
+            <tbody id="bbTbody"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -1471,6 +1687,7 @@ function fmt(n) { return Number(n||0).toLocaleString('en-IN',{minimumFractionDig
 const tabMeta = {
   dashboard: ['Dashboard',           'Telephone expense overview'],
   numbers:   ['Numbers',             'Register & manage telephone numbers'],
+  broadband: ['Broadband',           'Register & manage broadband connections'],
   payments:  ['Payments',            'Record single or split payments'],
   analysis:  ['Analytics',           'Expense charts & breakdown'],
   search:    ['Search',              'Find records instantly'],
@@ -1496,6 +1713,7 @@ function loadTab(t) {
   switch(t) {
     case 'dashboard': loadDash();    break;
     case 'numbers':   loadNums();    break;
+    case 'broadband': loadBB();      break;
     case 'payments':  loadPayTab();  break;
     case 'analysis':  loadAna();     break;
     case 'search':    doSearch();    break;
@@ -1949,6 +2167,241 @@ async function addMonth() {
     setTimeout(closeMonthModal,1200);
     loadMonthsGrid();
   }
+}
+
+/* ─── IMPORT ENGINE ──────────────────────── */
+// Staged import data
+const importStage = { mobile: [], broadband: [] };
+
+// Column maps — flexible header matching
+const MOB_MAP  = { branch:'branch', 'user name':'user_name', network:'network', 'mobile no':'mobile_no', 'mobile':'mobile_no', 'payment plan':'payment_plan', remarks:'remarks' };
+const BB_MAP   = { location:'location', 'account name':'acc_name', 'name':'acc_name', isp:'isp', 'account no':'acc_no', 'circuit no':'acc_no', 'plan speed':'speed', speed:'speed', 'payment plan':'payment_plan', amount:'amount', amt:'amount', remarks:'remarks' };
+
+function normalizeHeader(h) { return String(h).toLowerCase().trim().replace(/[_\-]/g,' '); }
+
+function parseSheet(data, colMap) {
+  const wb   = XLSX.read(data, { type:'array' });
+  const ws   = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, { header:1, defval:'' });
+  if (rows.length < 2) return [];
+
+  // Map headers
+  const headers = rows[0].map(normalizeHeader);
+  const colIdx  = {};
+  headers.forEach((h,i) => { if (colMap[h]) colIdx[colMap[h]] = i; });
+
+  return rows.slice(1).filter(r => r.some(c => String(c).trim())).map((r,idx) => {
+    const obj = { _row: idx+2, _err:[] };
+    Object.keys(colMap).forEach(k => {
+      const field = colMap[k];
+      const i     = colIdx[field];
+      obj[field]  = (i !== undefined) ? String(r[i]||'').trim() : '';
+    });
+    return obj;
+  });
+}
+
+function validateMobRow(r) {
+  if (!r.branch)     r._err.push('Branch missing');
+  if (!r.user_name)  r._err.push('User Name missing');
+  if (!r.network)    r._err.push('Network missing');
+  if (!r.mobile_no)  r._err.push('Mobile No missing');
+  else if (!/^\d{7,15}$/.test(r.mobile_no)) r._err.push('Invalid mobile no');
+  if (!r.payment_plan) r.payment_plan = 'Monthly';
+  return r;
+}
+
+function validateBBRow(r) {
+  if (!r.location)  r._err.push('Location missing');
+  if (!r.acc_name)  r._err.push('Account Name missing');
+  if (!r.isp)       r._err.push('ISP missing');
+  if (!r.payment_plan) r.payment_plan = 'Monthly';
+  return r;
+}
+
+function handleImportFile(evt, type) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data  = new Uint8Array(e.target.result);
+    const colMap = type==='mobile' ? MOB_MAP : BB_MAP;
+    let   rows  = parseSheet(data, colMap);
+    rows = type==='mobile' ? rows.map(validateMobRow) : rows.map(validateBBRow);
+    importStage[type] = rows;
+    renderImportPreview(type);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function renderImportPreview(type) {
+  const rows   = importStage[type];
+  const okRows = rows.filter(r => !r._err.length);
+  const errRows= rows.filter(r =>  r._err.length);
+  const prefix = type==='mobile' ? 'mob' : 'bb';
+
+  document.getElementById(`${prefix}ImportResult`).classList.add('show');
+  document.getElementById(`${prefix}ImportSummary`).innerHTML =
+    `<span class="imp-badge imp-tot"><i class="fas fa-table"></i> ${rows.length} rows</span>
+     <span class="imp-badge imp-ok"><i class="fas fa-check-circle"></i> ${okRows.length} valid</span>
+     ${errRows.length ? `<span class="imp-badge imp-err"><i class="fas fa-exclamation-circle"></i> ${errRows.length} errors</span>` : ''}`;
+
+  const tbody = document.getElementById(`${prefix}ImportTbody`);
+  if (type === 'mobile') {
+    tbody.innerHTML = rows.map((r,i)=>`
+      <tr>
+        <td>${i+1}</td><td>${r.branch||'—'}</td><td>${r.user_name||'—'}</td>
+        <td>${r.network||'—'}</td><td>${r.mobile_no||'—'}</td><td>${r.payment_plan||'—'}</td>
+        <td>${r._err.length
+          ? `<span class="tag tag-inactive" title="${r._err.join(', ')}"><i class="fas fa-times"></i> Error</span>`
+          : `<span class="tag tag-active"><i class="fas fa-check"></i> OK</span>`}</td>
+      </tr>`).join('');
+  } else {
+    tbody.innerHTML = rows.map((r,i)=>`
+      <tr>
+        <td>${i+1}</td><td>${r.location||'—'}</td><td>${r.acc_name||'—'}</td>
+        <td>${r.isp||'—'}</td><td>${r.acc_no||'—'}</td>
+        <td>${r.payment_plan||'—'}</td><td>₹${fmt(r.amount||0)}</td>
+        <td>${r._err.length
+          ? `<span class="tag tag-inactive" title="${r._err.join(', ')}"><i class="fas fa-times"></i> Error</span>`
+          : `<span class="tag tag-active"><i class="fas fa-check"></i> OK</span>`}</td>
+      </tr>`).join('');
+  }
+}
+
+async function confirmImport(type) {
+  if (!sb) { toast('Configure Supabase first.','err'); return; }
+  const okRows = importStage[type].filter(r => !r._err.length);
+  if (!okRows.length) { toast('No valid rows to import.','err'); return; }
+
+  const prefix  = type==='mobile' ? 'mob' : 'bb';
+  const btn     = document.getElementById(`btnConfirm${type==='mobile'?'Mob':'BB'}Import`);
+  btn.innerHTML = '<span class="spin"></span> Importing…'; btn.disabled = true;
+
+  let inserted = 0, failed = 0;
+  const table  = type==='mobile' ? 'telephone_numbers' : 'broadband_connections';
+
+  for (const r of okRows) {
+    const payload = type==='mobile'
+      ? { branch:r.branch, user_name:r.user_name, network:r.network, mobile_no:r.mobile_no, payment_plan:r.payment_plan, remarks:r.remarks||null }
+      : { location:r.location, acc_name:r.acc_name, isp:r.isp, acc_no:r.acc_no||null, speed:r.speed||null, payment_plan:r.payment_plan, amount:parseFloat(r.amount)||null, remarks:r.remarks||null };
+    const { error } = await sb.from(table).upsert(payload,
+      { onConflict: type==='mobile' ? 'branch,user_name,mobile_no' : 'location,acc_name,isp' });
+    if (error) failed++; else inserted++;
+  }
+
+  btn.innerHTML = `<i class="fas fa-database"></i> Import to Database`; btn.disabled = false;
+  toast(`Import done: ${inserted} saved${failed?', '+failed+' failed':''}`, failed?'err':'ok');
+  clearImport(type);
+  if (type==='mobile') loadNums(); else loadBB();
+}
+
+function clearImport(type) {
+  importStage[type] = [];
+  const prefix = type==='mobile' ? 'mob' : 'bb';
+  document.getElementById(`${prefix}ImportResult`).classList.remove('show');
+  // reset file input
+  const zone = document.getElementById(`${prefix==='mob'?'mob':'bb'}DropZone`);
+  if (zone) { const inp = zone.querySelector('input[type=file]'); if(inp) inp.value=''; }
+}
+
+/* ─── TEMPLATE DOWNLOAD ──────────────────── */
+function downloadTemplate(type) {
+  let headers, sample, filename;
+  if (type === 'mobile') {
+    headers  = ['Branch','User Name','Network','Mobile No','Payment Plan','Remarks'];
+    sample   = [
+      ['Vapi',  'Prashant', 'Airtel', '9377962727', 'Monthly',   ''],
+      ['Surat', 'Ramesh',   'Jio',    '9898989898', 'Quarterly', 'Office line'],
+    ];
+    filename = 'Telephone_Import_Template.xlsx';
+  } else {
+    headers  = ['Location','Account Name','ISP','Account No','Plan Speed','Payment Plan','Amount','Remarks'];
+    sample   = [
+      ['Surat',   'Office',    'DL GTPL',      'BB-001', '100 Mbps', 'Quarterly', 3000, ''],
+      ['Vapi',    'Warehouse', 'DD FIBER BB',  'BB-002', '50 Mbps',  'Monthly',   1500, 'Backup link'],
+    ];
+    filename = 'Broadband_Import_Template.xlsx';
+  }
+
+  const wb  = XLSX.utils.book_new();
+  const ws  = XLSX.utils.aoa_to_sheet([headers, ...sample]);
+
+  // Style header row width
+  ws['!cols'] = headers.map(() => ({ wch: 18 }));
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Data');
+  XLSX.writeFile(wb, filename);
+  toast(`Template downloaded: ${filename}`,'ok');
+}
+
+/* ─── BROADBAND CRUD ─────────────────────── */
+async function loadBB() {
+  if (!sb) { document.getElementById('bbTbody').innerHTML = `<tr><td colspan="10">${noConnHTML()}</td></tr>`; return; }
+  const { data, error } = await sb.from('broadband_connections').select('*').order('location').order('acc_name');
+  if (error) { toast(error.message,'err'); return; }
+  const rows = data||[];
+  document.getElementById('bbCount').textContent = rows.length + ' connections';
+  const tbody = document.getElementById('bbTbody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty"><i class="fas fa-wifi"></i><p>No broadband connections registered yet</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(r=>`
+    <tr>
+      <td><span class="tag tag-${r.status.toLowerCase()}">${r.status}</span></td>
+      <td>${r.location}</td>
+      <td style="color:var(--text-hi);font-weight:500">${r.acc_name}</td>
+      <td><span class="tag tag-bb">${r.isp}</span></td>
+      <td>${r.acc_no||'—'}</td>
+      <td>${r.speed||'—'}</td>
+      <td><span class="tag tag-mode">${r.payment_plan}</span></td>
+      <td style="color:var(--text-hi);font-weight:600">${r.amount ? '₹'+fmt(r.amount) : '—'}</td>
+      <td>${r.remarks||'—'}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="toggleBBSt('${r.id}','${r.status}')"
+          style="color:${r.status==='Active'?'var(--success)':'var(--danger)'}">
+          <i class="fas fa-toggle-${r.status==='Active'?'on':'off'}"></i>
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+async function saveBroadband() {
+  if (!sb) { showAlert('alBB','Configure Supabase first.','err'); return; }
+  const loc   = document.getElementById('bb_loc').value.trim();
+  const name  = document.getElementById('bb_name').value.trim();
+  const isp   = document.getElementById('bb_isp').value.trim();
+  const acc   = document.getElementById('bb_acc').value.trim();
+  const speed = document.getElementById('bb_speed').value.trim();
+  const plan  = document.getElementById('bb_plan').value;
+  const amt   = parseFloat(document.getElementById('bb_amt').value)||null;
+  const rem   = document.getElementById('bb_rem').value.trim();
+
+  if (!loc||!name||!isp) { showAlert('alBB','Location, Name and ISP are required.','err'); return; }
+
+  const btn = document.getElementById('btnSaveBB');
+  btn.innerHTML = '<span class="spin"></span> Saving…'; btn.disabled = true;
+
+  const { error } = await sb.from('broadband_connections').upsert(
+    { location:loc, acc_name:name, isp, acc_no:acc||null, speed:speed||null, payment_plan:plan, amount:amt, remarks:rem||null },
+    { onConflict:'location,acc_name,isp' }
+  );
+  btn.innerHTML = '<i class="fas fa-save"></i> Save Broadband'; btn.disabled = false;
+
+  if (error) showAlert('alBB', error.code==='23505' ? 'This connection already exists.' : error.message, 'err');
+  else { showAlert('alBB','Broadband connection saved!','ok'); clearBBForm(); loadBB(); }
+}
+
+function clearBBForm() {
+  ['bb_loc','bb_name','bb_isp','bb_acc','bb_speed','bb_amt','bb_rem'].forEach(id => document.getElementById(id).value='');
+}
+
+async function toggleBBSt(id, cur) {
+  const next = cur==='Active'?'Inactive':'Active';
+  const { error } = await sb.from('broadband_connections').update({status:next}).eq('id',id);
+  if (error) toast(error.message,'err');
+  else { toast(`BB Status → ${next}`,'ok'); loadBB(); }
 }
 
 /* ─── HELPERS ────────────────────────────── */
